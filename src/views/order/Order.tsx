@@ -37,7 +37,11 @@ import DocumentsApi from '../documents/Documents.Api'
 import AuthApi from '../auth/auth.api'
 import Card from '../../components/Card'
 
-import { getImagePlaceholderFromMime, phoneNumber } from '../../utils'
+import {
+  getImagePlaceholderFromMime,
+  phoneNumber,
+  printOrDownloadDoc,
+} from '../../utils'
 import setTime, { setTimeV2 } from '../../helper/timeFormat'
 import api from '../../api'
 import { monthToWord } from '../../helper/timeFormat'
@@ -56,6 +60,36 @@ const OrderDetail = (): JSX.Element => {
     order: 0,
     users_permissions_user: 0,
   })
+  const RequestRef = useRef<HTMLDivElement | null>(null)
+  const ActRef = useRef<HTMLDivElement | null>(null)
+  const CommentsRef = useRef<HTMLDivElement | null>(null)
+
+  const onDownloadHandler =
+    (ref: React.RefObject<HTMLDivElement>, print: boolean) => () => {
+      const wrapperElement = document.createElement('div')
+      wrapperElement.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    margin-top: 100px;
+    `
+
+      const familyElement = document.createElement('div')
+      familyElement.textContent = 'Фамилия____________________'
+
+      const signElement = document.createElement('div')
+      signElement.textContent = 'Подпись__________________'
+
+      wrapperElement.appendChild(familyElement)
+      wrapperElement.appendChild(signElement)
+
+      if (ref.current) {
+        ref.current.style.width = '900px'
+        ref.current.appendChild(wrapperElement)
+        printOrDownloadDoc(ref, print)
+        ref.current.removeChild(wrapperElement)
+        ref.current.style.width = 'auto'
+      }
+    }
 
   const [loading, setLoading] = useState(true)
   const [dataModal, setDataModal] = useState<any>({
@@ -418,6 +452,7 @@ const OrderDetail = (): JSX.Element => {
               </div>
             </CCardHeader>
             <CCardBody
+              ref={RequestRef}
               style={{
                 padding: '6rem 4rem',
               }}
@@ -1123,6 +1158,14 @@ const OrderDetail = (): JSX.Element => {
                 </CForm>
               </CCol>
             </CCardBody>
+            <div className="documentBtns">
+              <CButton onClick={onDownloadHandler(RequestRef, false)}>
+                Скачать
+              </CButton>
+              <CButton onClick={onDownloadHandler(RequestRef, true)}>
+                Печать
+              </CButton>
+            </div>
           </CCard>
           {/* THIRD CARD */}
           {actDetail.id || !isView ? (
@@ -1131,6 +1174,7 @@ const OrderDetail = (): JSX.Element => {
                 <div>Акт отбора проб № {actDetail?.id}</div>
               </CCardHeader>
               <CCardBody
+                ref={ActRef}
                 style={{
                   padding: '4rem 4rem',
                 }}
@@ -1747,6 +1791,14 @@ const OrderDetail = (): JSX.Element => {
                   </CForm>
                 </CCol>
               </CCardBody>
+              <div className="documentBtns">
+                <CButton onClick={onDownloadHandler(ActRef, false)}>
+                  Скачать
+                </CButton>
+                <CButton onClick={onDownloadHandler(ActRef, true)}>
+                  Печать
+                </CButton>
+              </div>
             </CCard>
           ) : (
             <></>
@@ -1841,6 +1893,7 @@ const OrderDetail = (): JSX.Element => {
               <div>Комментарии к заявке</div>
             </CCardHeader>
             <CCardBody
+              ref={CommentsRef}
               style={{
                 padding: '4rem 4rem',
               }}
@@ -1987,6 +2040,14 @@ const OrderDetail = (): JSX.Element => {
                 </CForm>
               </CCol>
             </CCardBody>
+            <div className="documentBtns">
+              <CButton onClick={onDownloadHandler(CommentsRef, false)}>
+                Скачать
+              </CButton>
+              <CButton onClick={onDownloadHandler(CommentsRef, true)}>
+                Печать
+              </CButton>
+            </div>
           </CCard>
           {/* PROTOCOL CARD */}
           {data?.protocols?.length ? (

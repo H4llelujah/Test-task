@@ -12,7 +12,7 @@ import {
   CModalFooter,
   CCardHeader,
 } from '@coreui/react-pro'
-import React, { createRef, useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import DocumentsApi from './Documents.Api'
 import { useParams } from 'react-router-dom'
@@ -58,6 +58,8 @@ const Document = (): JSX.Element => {
   const [titleName, setTitleName] = useState('')
   const [dataFormat, setDataFormat] = useState('')
 
+  const pdfRef = useRef<HTMLDivElement | null>(null)
+
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const docName = searchParams.get('name')
@@ -68,6 +70,11 @@ const Document = (): JSX.Element => {
       setShowPicture(result.data)
     })
   }
+
+  const onDownloadHandler =
+    (ref: React.RefObject<HTMLDivElement>, print: boolean) => () => {
+      printOrDownloadDoc(ref, print, 1)
+    }
 
   useEffect(() => {
     getDocumentsShow(id)
@@ -89,7 +96,6 @@ const Document = (): JSX.Element => {
           >
             <p className="fs-1">{titleName}</p>
           </div>
-
           <div
             className="mt-2"
             style={{
@@ -102,6 +108,7 @@ const Document = (): JSX.Element => {
               <>
                 {showPicture?.file?.url.includes('.pdf') ? (
                   <div
+                    ref={pdfRef}
                     className="pdf-viewer"
                     style={{
                       border: '1px solid rgba(0, 0, 0, 0.3)',
@@ -132,6 +139,12 @@ const Document = (): JSX.Element => {
             ) : (
               <></>
             )}
+          </div>
+          <div className="documentBtns">
+            <CButton onClick={onDownloadHandler(pdfRef, false)}>
+              Скачать
+            </CButton>
+            <CButton onClick={onDownloadHandler(pdfRef, true)}>Печать</CButton>
           </div>
         </CCardBody>
       </CCard>

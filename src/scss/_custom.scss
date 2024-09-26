@@ -89,6 +89,16 @@
   line-height: 14px;
 }
 
+.documentBtns {
+  display: flex;
+  justify-content: end;
+  gap: 34px;
+  padding: 6rem 4rem;
+  button {
+    min-width: 300px;
+  }
+}
+
 @media (min-width: 1400px) {
   .add-party {
     margin-right: 6.5%;
@@ -120,4 +130,10 @@
   html:not([dir='rtl']) .sidebar.hide:not(.sidebar-end) {
     margin-left: calc(-1 * var(--cui-sidebar-width));
   }
+}
+
+
+.pdf-viewer {
+  width: 100%;
+  height: auto;
 }
